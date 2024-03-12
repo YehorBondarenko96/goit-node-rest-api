@@ -50,6 +50,8 @@ const updateContact = async (req, res) => {
     res.status(200).json(result);
 };
 
+const updateStatusCont = async (req, res) => {};
+
 export default {
     getAllContacts: decForFn(getAllContacts),
     getOneContact: decForFn(getOneContact),
