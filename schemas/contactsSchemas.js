@@ -13,3 +13,7 @@ export const updateContactSchema = Joi.object({
     phone: Joi.string().pattern(/^[+\-\d()]+$/),
     favorite: Joi.boolean(),
 })
+
+export const updateStatusContShema = Joi.object({
+    favorite: Joi.boolean().required(),
+})

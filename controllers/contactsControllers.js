@@ -1,7 +1,7 @@
 import contactsService from "../services/contactsServices.js";
 import decForFn from "../decorators/decForFuncs.js";
 import HttpError from "../helpers/HttpError.js";
-import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
+import { createContactSchema, updateContactSchema, updateStatusContShema } from "../schemas/contactsSchemas.js";
 
 const getAllContacts = async (req, res) => {
     const result = await contactsService.listContacts();
@@ -45,17 +45,29 @@ const updateContact = async (req, res) => {
     }
     const result = await contactsService.updateContactById(req.params.id, req.body);
     if (!result) {
+
         throw HttpError(404);
     }
     res.status(200).json(result);
 };
 
-const updateStatusCont = async (req, res) => {};
+const updateStatusCont = async (req, res) => {
+    const { error } = updateStatusContShema.validate(req.body);
+    if (error) {
+        throw HttpError(400, error.message);
+    }
+    const result = await contactsService.updateContactById(req.params.id, req.body);
+    if (!result) {
+        throw HttpError(404);
+    }
+    res.status(200).json(result);
+};
 
 export default {
     getAllContacts: decForFn(getAllContacts),
     getOneContact: decForFn(getOneContact),
     deleteContact: decForFn(deleteContact),
     createContact: decForFn(createContact),
-    updateContact: decForFn(updateContact)
+    updateContact: decForFn(updateContact),
+    updateStatusCont: decForFn(updateStatusCont)
 }
