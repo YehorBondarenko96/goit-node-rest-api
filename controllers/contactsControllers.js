@@ -4,13 +4,16 @@ import HttpError from "../helpers/HttpError.js";
 import { createContactSchema, updateContactSchema, updateStatusContShema } from "../schemas/contactsSchemas.js";
 
 const getAllContacts = async (req, res) => {
-    const result = await contactsService.listContacts();
-console.log(req.user);
+    const { _id: owner } = req.user;
+    const result = await contactsService.listContacts({ owner });
+    
     res.json(result);
 };
 
 const getOneContact = async (req, res) => {
-    const result = await contactsService.getContactById(req.params.id);
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+    const result = await contactsService.getOneContact({_id: id, owner});
     if (!result) {
         throw HttpError(404);
     }
@@ -18,7 +21,9 @@ const getOneContact = async (req, res) => {
 };
 
 const deleteContact = async (req, res) => {
-    const result = await contactsService.removeContact(req.params.id);
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+    const result = await contactsService.removeContact({_id: id, owner});
     if (!result) {
         throw HttpError(404);
     }
@@ -27,10 +32,11 @@ const deleteContact = async (req, res) => {
 
 const createContact = async (req, res) => {
     const { error } = createContactSchema.validate(req.body);
+    const { _id: owner } = req.user;
     if (error) {
         throw HttpError(400, error.message);
     }
-    const result = await contactsService.addContact(req.body);
+    const result = await contactsService.addContact({...req.body, owner});
     
     res.status(201).json(result);
 };
@@ -43,7 +49,10 @@ const updateContact = async (req, res) => {
     if (error) {
         throw HttpError(400, error.message);
     }
-    const result = await contactsService.updateContactById(req.params.id, req.body);
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+
+    const result = await contactsService.updateContactS({_id: id, owner}, req.body);
     if (!result) {
 
         throw HttpError(404);
@@ -56,7 +65,10 @@ const updateStatusCont = async (req, res) => {
     if (error) {
         throw HttpError(400, error.message);
     }
-    const result = await contactsService.updateContactById(req.params.id, req.body);
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+
+    const result = await contactsService.updateContactS({_id: id, owner}, req.body);
     if (!result) {
         throw HttpError(404);
     }
