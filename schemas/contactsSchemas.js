@@ -5,6 +5,7 @@ export const createContactSchema = Joi.object({
     email: Joi.string().pattern(new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)).required(),
     phone: Joi.string().pattern(/^[+\-\d()]+$/).required(),
     favorite: Joi.boolean(),
+    owner: Joi.string(),
 })
 
 export const updateContactSchema = Joi.object({
@@ -12,6 +13,7 @@ export const updateContactSchema = Joi.object({
     email: Joi.string().pattern(new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
     phone: Joi.string().pattern(/^[+\-\d()]+$/),
     favorite: Joi.boolean(),
+    owner: Joi.string(),
 })
 
 export const updateStatusContShema = Joi.object({
