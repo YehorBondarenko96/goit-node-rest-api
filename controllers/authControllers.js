@@ -52,10 +52,11 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-    const {email} = req.user;
+    const {email, subscription} = req.user;
 
     res.json({
-        email
+        email,
+        subscription
     });
 };
 
@@ -64,8 +65,8 @@ const signout = async (req, res) => {
 
     await authServices.updateUser({ _id }, { token: null });
 
-    res.json({
-        message: "Signout success"
+    res.status(204).json({
+        message: "No Content"
     })
 };
 
