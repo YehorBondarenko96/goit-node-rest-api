@@ -70,9 +70,19 @@ const signout = async (req, res) => {
     })
 };
 
+const setSubsc = async (req, res) => {
+    const { _id } = req.user;
+    const { subscription } = req.body;
+    await authServices.updateUser({ _id }, { subscription });
+    res.status(200).json({
+        message: "Subscription successfully updated"
+    })
+};
+
 export default {
     signup: decForFn(signup),
     signin: decForFn(signin),
     getCurrent: decForFn(getCurrent),
     signout: decForFn(signout),
+    setSubsc: decForFn(setSubsc)
 }

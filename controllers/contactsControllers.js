@@ -5,9 +5,10 @@ import { createContactSchema, updateContactSchema, updateStatusContShema } from 
 
 const getAllContacts = async (req, res) => {
     const { _id: owner } = req.user;
-    const { page, limit } = req.query;
+    const { page, limit, favorite } = req.query;
     const skip = (page - 1) * limit;
-    const result = await contactsService.listContacts({ owner }, {skip, limit});
+    const filter = favorite ? { owner, favorite } : { owner };
+    const result = await contactsService.listContacts(filter, {skip, limit});
     
     res.json(result);
 };
