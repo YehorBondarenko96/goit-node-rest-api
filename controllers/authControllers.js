@@ -3,6 +3,12 @@ import decForFn from "../decorators/decForFuncs.js";
 import * as authServices from "../services/authServices.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import fs from "fs/promises";
+import path from "path";
+import gravatar from "gravatar";
+import Jimp from "jimp";
+
+const avatarPath = path.resolve("public", "avatars");
 
 dotenv.config();
 
@@ -14,7 +20,8 @@ const signup = async (req, res) => {
     if (user) {
         throw HttpError(409, "Email is use");
     }
-    const newUser = await authServices.signup(req.body);
+    const avatar = gravatar.url(email, {s: 250, d: 'identicon'});
+    const newUser = await authServices.signup({...req.body, avatarURL: `https:${avatar}`});
 
     res.status(201).json({
         user: {
@@ -79,10 +86,32 @@ const setSubsc = async (req, res) => {
     })
 };
 
+const setAvatar = async (req, res) => {
+    const { _id } = req.user;
+    const { path: oldPath, filename } = req.file;
+    const arFilename = filename.split(".");
+    const newArFilename = arFilename.splice(arFilename.length - 1, 1, "jpg");
+    const newFilename = arFilename.join(".");
+    const newPath = path.join(avatarPath, newFilename);
+
+    await fs.rename(oldPath, newPath);
+    console.log('newPath: ', newPath);
+
+    const avatarImage = await Jimp.read(newPath);
+    await avatarImage.resize(250, 250).writeAsync(newPath);
+
+    const avatar = path.join("avatars", newFilename);
+    await authServices.updateUser({ _id }, { avatarURL: avatar });
+    res.status(200).json({
+        avatarURL: avatar
+    })
+};
+
 export default {
     signup: decForFn(signup),
     signin: decForFn(signin),
     getCurrent: decForFn(getCurrent),
     signout: decForFn(signout),
-    setSubsc: decForFn(setSubsc)
+    setSubsc: decForFn(setSubsc),
+    setAvatar: decForFn(setAvatar)
 }
