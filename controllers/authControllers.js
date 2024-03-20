@@ -89,18 +89,14 @@ const setSubsc = async (req, res) => {
 const setAvatar = async (req, res) => {
     const { _id } = req.user;
     const { path: oldPath, filename } = req.file;
-    const arFilename = filename.split(".");
-    const newArFilename = arFilename.splice(arFilename.length - 1, 1, "jpg");
-    const newFilename = arFilename.join(".");
-    const newPath = path.join(avatarPath, newFilename);
+    const newPath = path.join(avatarPath, filename);
 
     await fs.rename(oldPath, newPath);
-    console.log('newPath: ', newPath);
 
     const avatarImage = await Jimp.read(newPath);
     await avatarImage.resize(250, 250).writeAsync(newPath);
 
-    const avatar = path.join("avatars", newFilename);
+    const avatar = path.join("avatars", filename);
     await authServices.updateUser({ _id }, { avatarURL: avatar });
     res.status(200).json({
         avatarURL: avatar
