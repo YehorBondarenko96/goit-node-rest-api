@@ -43,4 +43,6 @@ mongoose.connect(process.env.DB_HOST)
     process.exit(1);
   });
 
+export default app;
+
 //ymiCcpPVLs4n-w5
