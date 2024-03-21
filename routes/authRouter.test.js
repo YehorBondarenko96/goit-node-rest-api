@@ -2,14 +2,16 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../app.js";
 
-const { DB_HOST, TEST_PORT = 3001 } = process.env;
+const { TEST_DB_HOST, TEST_PORT = 3000 } = process.env;
 
 describe("test /login route", () => {
     let server = null;
 
     beforeAll(async () => {
-            await mongoose.connect(DB_HOST);
-            server = app.listen(TEST_PORT);
+    if (!mongoose.connection.readyState) {
+        await mongoose.connect(TEST_DB_HOST);
+    }
+    server = app.listen(TEST_PORT);
     });
 
     afterAll(async () => {
