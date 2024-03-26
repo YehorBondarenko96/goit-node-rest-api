@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../app.js";
 
-const { TEST_DB_HOST, TEST_PORT = 3000 } = process.env;
+const { TEST_DB_HOST, TEST_PORT = 3001 } = process.env;
 
 describe("test /login route", () => {
     let server = null;
