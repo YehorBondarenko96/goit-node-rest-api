@@ -43,6 +43,42 @@ const signup = async (req, res) => {
     })
 };
 
+const verify = async (req, res) => {
+    const { verificationToken } = req.params;
+    const user = await authServices.findUser({ verificationToken });
+    if (!user) {
+        throw HttpError(404, "User not found")
+    };
+    await authServices.updateUser({ _id: user._id }, { verify: true, verificationToken: null });
+
+    res.json({
+        message: "Verification successful"
+    })
+};
+
+const resendVerify = async (req, res) => {
+    const { email } = req.body;
+    const user = await authServices.findUser({ email });
+    if (!user) {
+        throw HttpError(404, "Email not found")
+    };
+    if (user.verify) {
+        throw HttpError(400, "Verification has already been passed")
+    };
+
+    const verifyEmailData = {
+        to: "megebox920@otemdi.com",
+        subject: "Please, verify your email",
+        html: `<a href="${BASE_URL}/api/users/verify/${user.verificationToken}" turget="_blank">Please, verify your email</a>`
+    };
+
+    sendEmail(verifyEmailData);
+
+    res.json({
+        message: "Verification email sent"
+    })
+};
+
 const signin = async (req, res) => {
     const { email, password } = req.body;
     const user = await authServices.findUser({ email });
@@ -52,6 +88,9 @@ const signin = async (req, res) => {
     const isValidPass = await authServices.validPass(password, user.password);
     if (!isValidPass) { 
         throw HttpError(401, "Email or password not wrong");
+    };
+    if (!user.verify) {
+        throw HttpError(401, "Email not verify")
     };
 
     const { _id: id } = user;
@@ -117,6 +156,8 @@ const setAvatar = async (req, res) => {
 
 export default {
     signup: decForFn(signup),
+    verify: decForFn(verify),
+    resendVerify: decForFn(resendVerify),
     signin: decForFn(signin),
     getCurrent: decForFn(getCurrent),
     signout: decForFn(signout),
